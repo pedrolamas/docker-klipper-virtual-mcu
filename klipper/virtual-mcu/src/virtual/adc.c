@@ -12,7 +12,7 @@
 DECL_CONSTANT("ADC_MAX", ADC_MAX);
 
 // 100K NTC thermistor at 25C with a 4.7K pull-up: 100/(100+4.7) of full
-// scale. Phase 1 reports this "room temperature" on every analog pin.
+// scale. Reported on analog pins that have no thermal zone attached.
 #define ADC_ROOM_TEMP ((uint16_t)(ADC_MAX * 100000ULL / (100000 + 4700)))
 
 struct gpio_adc
@@ -35,6 +35,8 @@ gpio_adc_sample(struct gpio_adc g)
 uint16_t
 gpio_adc_read(struct gpio_adc g)
 {
+    if (g.pin->senses)
+        return thermal_adc_read(g.pin->senses, ADC_MAX);
     return ADC_ROOM_TEMP;
 }
 

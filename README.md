@@ -52,9 +52,24 @@ docker run -d \
 | Variable               | Default   | Description                                                   |
 | ---------------------- | --------- | ------------------------------------------------------------- |
 | `MCU_BACKEND`          | `virtual` | `virtual` (native virtual MCU) or `simulavr`                  |
+| `VIRTUAL_MCU_ARGS`     |           | Extra options for the virtual MCU (see below)                 |
 | `SIMULAVR_PACING_RATE` | `0.0`     | Real-time pacing rate for simulavr (only used with simulavr)  |
 
 Both backends expose the MCU serial port at `/tmp/pseudoserial`.
+
+### Simulated heaters
+
+The virtual MCU simulates heaters: each "thermal zone" pairs a heater pin with a thermistor (EPCOS 100K B57560G104F, 4.7K pull-up) sensor pin, and the temperature follows the heater's duty cycle. The default zones match the bundled configuration:
+
+| Heater | Heater pin | Sensor pin | Preset   |
+| ------ | ---------- | ---------- | -------- |
+| `extruder`   | `PD7` | `PA5` | `hotend` (~200°C in 40s, 300°C max) |
+| `extruder1`  | `PD3` | `PA6` | `hotend` |
+| `heater_bed` | `PB4` | `PA7` | `bed` (~60°C in 150s, 130°C max) |
+
+If you use your own `printer.cfg` with different pins, replace the zones with `-T HEATER_PIN:SENSOR_PIN:PRESET` options (repeatable, or `-T none` to disable them), for example `-e VIRTUAL_MCU_ARGS="-T PD5:PA0:hotend -T PD6:PA1:bed"`. Analog pins without a zone read a constant 25°C.
+
+Heaters are not simulated with the `simulavr` backend, so heating to a target temperature will fail there.
 
 The default configuration files used can be found on the [klipper_config](/klipper_config) folder.
 

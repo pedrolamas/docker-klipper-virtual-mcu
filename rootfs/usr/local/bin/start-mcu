@@ -8,7 +8,9 @@ SERIAL=/tmp/pseudoserial
 
 case "${MCU_BACKEND:-virtual}" in
   virtual)
-    exec /usr/local/bin/klipper_virtual_mcu -I "$SERIAL"
+    # VIRTUAL_MCU_ARGS can add options, eg "-T PD7:PA5:hotend -T PB4:PA7:bed"
+    # shellcheck disable=SC2086
+    exec /usr/local/bin/klipper_virtual_mcu -I "$SERIAL" ${VIRTUAL_MCU_ARGS}
     ;;
   simulavr)
     export PYTHONPATH=/printer/pysimulavr

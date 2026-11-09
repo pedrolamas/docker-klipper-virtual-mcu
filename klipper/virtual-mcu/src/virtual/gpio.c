@@ -30,13 +30,27 @@ virtual_pin_get(uint32_t pin)
     return &pins[pin];
 }
 
+// Parse an AVR style pin name ("PD7") into a pin id
+int
+virtual_pin_parse(const char *name, uint32_t *pin)
+{
+    if (name[0] != 'P' || name[1] < 'A' || name[1] > 'L' || name[1] == 'I'
+        || name[2] < '0' || name[2] > '7' || name[3])
+        return -1;
+    *pin = VGPIO(name[1], name[2] - '0');
+    return 0;
+}
+
 static void
 pin_set_state(struct virtual_pin *p, uint8_t val)
 {
     val = !!val;
     if (p->state != val) {
+        uint32_t now = timer_read_time();
+        if (p->heats)
+            thermal_heater_changed(p->heats, p->state, now);
         p->state = val;
-        p->changed = timer_read_time();
+        p->changed = now;
     }
 }
 

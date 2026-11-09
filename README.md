@@ -8,7 +8,7 @@
 [![Follow pedrolamas.com on Bluesky](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpublic.api.bsky.app%2Fxrpc%2Fapp.bsky.actor.getProfile%2F%3Factor%3Dpedrolamas.com&query=%24.followersCount&style=social&logo=bluesky&label=Follow%20%40pedrolamas.com)](https://bsky.app/profile/pedrolamas.com)
 [![Follow pedrolamas on Mastodon](https://img.shields.io/mastodon/follow/109365776481898704?label=Follow%20@pedrolamas%20on%20Mastodon&domain=https%3A%2F%2Fhachyderm.io&style=social)](https://hachyderm.io/@pedrolamas)
 
-Simple Docker image running [Klipper](https://github.com/Klipper3d/klipper/) with Simulavr, [Moonraker](https://github.com/Arksine/moonraker/), and [mjpg-streamer](https://github.com/jacksonliam/mjpg-streamer).
+Simple Docker image running [Klipper](https://github.com/Klipper3d/klipper/) with a simulated MCU, [Moonraker](https://github.com/Arksine/moonraker/), and [mjpg-streamer](https://github.com/jacksonliam/mjpg-streamer).
 
 This repo will run a GitHub action every hour to check for new code on the default branches of the Klipper and Moonraker repositories, and creates a new Docker image if there are any modifications.
 
@@ -23,7 +23,7 @@ docker run -d \
   ei99070/docker-klipper-simulavr
 ```
 
-This will start Klipper with a simulated Atmel ATmega micro-controller, Moonraker on port 7125, and mjpg-streamer on port 8080.
+This will start Klipper with a simulated micro-controller, Moonraker on port 7125, and mjpg-streamer on port 8080.
 
 If you need to remap the default ports, run the container under the bridge network instead:
 
@@ -35,27 +35,16 @@ docker run -d \
   ei99070/docker-klipper-simulavr
 ```
 
-## MCU backend
+## Virtual MCU
 
-By default the printer's main MCU is a native "virtual MCU": the Klipper micro-controller code compiled as a Linux process with simulated pins (AVR style names, `PA0`..`PL7`). It uses almost no CPU when idle and keeps accurate time.
+The printer's main MCU is a native "virtual MCU": the Klipper micro-controller code compiled as a Linux process with simulated pins (AVR style names, `PA0`..`PL7`), exposing its serial port at `/tmp/pseudoserial`. It uses almost no CPU when idle and keeps accurate time.
 
-The previous simulavr based atmega644p simulation is still included and can be selected with the `MCU_BACKEND` environment variable:
+> [!NOTE]
+> Earlier versions of this image used [simulavr](https://github.com/pedrolamas/simulavr) to emulate an ATmega644P. It has been replaced by the virtual MCU, and the `SIMULAVR_PACING_RATE` environment variable is no longer used.
 
-```sh
-docker run -d \
-  --name klipper-simulavr \
-  --net=host \
-  -e MCU_BACKEND=simulavr \
-  ei99070/docker-klipper-simulavr
-```
-
-| Variable               | Default   | Description                                                   |
-| ---------------------- | --------- | ------------------------------------------------------------- |
-| `MCU_BACKEND`          | `virtual` | `virtual` (native virtual MCU) or `simulavr`                  |
-| `VIRTUAL_MCU_ARGS`     |           | Extra options for the virtual MCU (see below)                 |
-| `SIMULAVR_PACING_RATE` | `0.0`     | Real-time pacing rate for simulavr (only used with simulavr)  |
-
-Both backends expose the MCU serial port at `/tmp/pseudoserial`.
+| Variable           | Default | Description                                   |
+| ------------------ | ------- | --------------------------------------------- |
+| `VIRTUAL_MCU_ARGS` |         | Extra options for the virtual MCU (see below) |
 
 ### Simulated heaters
 
@@ -68,8 +57,6 @@ The virtual MCU simulates heaters: each "thermal zone" pairs a heater pin with a
 | `heater_bed` | `PB4` | `PA7` | `bed` (~60°C in 150s, 130°C max) |
 
 If you use your own `printer.cfg` with different pins, replace the zones with `-T HEATER_PIN:SENSOR_PIN:PRESET` options (repeatable, or `-T none` to disable them), for example `-e VIRTUAL_MCU_ARGS="-T PD5:PA0:hotend -T PD6:PA1:bed"`. Analog pins without a zone read a constant 25°C.
-
-Heaters are not simulated with the `simulavr` backend, so heating to a target temperature will fail there.
 
 The default configuration files used can be found on the [klipper_config](/klipper_config) folder.
 
@@ -93,7 +80,6 @@ This is the runtime folder structure:
       /moonraker.log
       /supervisord.log
     /moonraker.asvc
-  /pysimulavr
 ```
 
 Any of these files can be overrided by mapping the folder or the specific file.
@@ -134,20 +120,6 @@ docker exec -it klipper-simulavr enable-timelapse
 - `latest`: points to Klipper and Moonraker default branches
 - `klipper-sha-<hash>`: points to the Klipper GitHub commit hash
 - `moonraker-sha-<hash>`: points to the Moonraker GitHub commit hash
-
-## FAQ
-
-### I keep getting "MCU 'mcu' shutdown: Timer too close"
-
-Start the container with `SIMULAVR_PACING_RATE` environment variable set to something like `0.2`, like this:
-
-```sh
-docker run -d \
-  --name klipper-simulavr \
-  --net=host \
-  -e SIMULAVR_PACING_RATE=0.2
-  ei99070/docker-klipper-simulavr
-```
 
 ## Support my work
 

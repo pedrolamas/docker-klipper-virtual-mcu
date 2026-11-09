@@ -7,7 +7,7 @@
 #include "sched.h" // sched_shutdown
 #include "virtual.h" // virtual_pin_get
 
-// Same resolution as the AVR adc so thermistor maths matches simulavr
+// Same resolution as the AVR adc the bundled configs were written for
 #define ADC_MAX 1023
 DECL_CONSTANT("ADC_MAX", ADC_MAX);
 

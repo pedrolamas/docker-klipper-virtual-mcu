@@ -1,6 +1,6 @@
-# ATmega644P Pinmap for Klipper Simulavr
+# Virtual MCU Pinmap
 
-This document provides a comprehensive pinmap for the ATmega644P microcontroller and how its pins are configured in the Klipper simulavr setup based on the actual configuration files.
+This document provides a comprehensive pinmap for the virtual MCU and how its pins are configured in the bundled configuration files. The pin names and numbering follow the ATmega644P layout the configuration was originally written for.
 
 ## Pin Configuration Table
 
@@ -66,7 +66,7 @@ This document provides a comprehensive pinmap for the ATmega644P microcontroller
 - **Extruder**: PD7 (heater), PA5 (sensor)
 - **Extruder1**: PD3 (heater), PA6 (sensor)
 
-With the default virtual MCU backend each heater/sensor pair is a simulated thermal zone, so temperatures respond to the heater. With the simulavr backend heaters have no effect on the sensors.
+Each heater/sensor pair is a simulated thermal zone, so temperatures respond to the heater.
 
 ### Available Pins
 
@@ -87,10 +87,10 @@ The following pins are currently unassigned and available for additional feature
 
 ## Notes
 
-- This pinmap is designed for **simulavr simulation** with the Klipper firmware
+- This pinmap is designed for the **virtual MCU** with the Klipper firmware
 - The pin assignments are defined in the Klipper configuration files for virtual hardware simulation
 - Fans and enable pins use virtual pins rather than physical pins; heaters use MCU pins
 - ADC channels (Port A) are used for temperature sensing simulation
 - JTAG debugging pins (PC2-PC6) and timer-related pins (PB0-PB1, PC6-PC7, PD4-PD6) are repurposed for stepper motor control
 - All hardware communication interfaces (SPI, I²C, UART) remain available for expansion
-- Pin assignments match the simulavr virtual ATmega644P implementation
+- The virtual MCU accepts any pin from PA0 to PL7; only the ATmega644P ports (A-D) are listed here

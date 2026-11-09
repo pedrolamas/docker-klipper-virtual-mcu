@@ -4,7 +4,7 @@
 
 #include <stdint.h> // uint32_t
 
-// Pins use AVR style names (PA0..PL7) so existing simulavr configs work
+// Pins use AVR style names (PA0..PL7) so existing AVR configs work
 #define VPORT_COUNT 12 // A..L
 #define VGPIO(PORT, NUM) (((PORT) - 'A') * 8 + (NUM))
 #define VPIN_COUNT (VPORT_COUNT * 8)

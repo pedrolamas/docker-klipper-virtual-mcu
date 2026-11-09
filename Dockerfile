@@ -6,7 +6,6 @@ ARG KLIPPER_REPOSITORY=https://github.com/klipper3d/klipper
 ARG MOONRAKER_REPOSITORY=https://github.com/Arksine/moonraker
 ARG KLIPPER_SHA
 ARG MOONRAKER_SHA
-ARG SIMULAVR_SHA
 ARG MJPG_STREAMER_SHA
 ARG KLIPPER_VIRTUAL_PINS_SHA
 ARG KIAUH_SHA
@@ -18,12 +17,9 @@ RUN <<eot
   set -e
   apt-get update -qq
   DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends --no-install-suggests \
-    avr-libc \
     cmake \
-    fakeroot \
     g++ \
     git \
-    help2man \
     libcurl4-openssl-dev \
     libffi-dev \
     libldap2-dev \
@@ -33,37 +29,11 @@ RUN <<eot
     python3 \
     python3-dev \
     python3-setuptools \
-    python3-virtualenv \
-    rst2pdf \
-    swig \
-    texinfo
+    python3-virtualenv
   rm -rf /var/lib/apt/lists/*
 eot
 
 WORKDIR /build
-
-
-### simulavr
-
-FROM tools AS build_simulavr
-
-ARG SIMULAVR_SHA
-
-RUN : "${SIMULAVR_SHA}" && git clone https://github.com/pedrolamas/simulavr
-
-RUN <<eot
-  set -e
-  (
-    cd simulavr
-    CXXFLAGS="-Wno-overloaded-virtual" make cfgclean python build
-    (
-      cd build/pysimulavr
-      mkdir pysimulavr
-      strip *.so -o pysimulavr/_pysimulavr.so
-      cp pysimulavr.py pysimulavr/
-    )
-  )
-eot
 
 
 ## klipper
@@ -79,18 +49,6 @@ RUN <<eot
   (
     cd klipper
     [ -n "$KLIPPER_SHA" ] && git reset --hard $KLIPPER_SHA || true
-  )
-eot
-
-FROM klipper_source AS build_klipper_simulavr
-
-COPY klipper/simulavr.config ./klipper/.config
-
-RUN <<eot
-  set -e
-  (
-    cd klipper
-    make
   )
 eot
 
@@ -229,12 +187,8 @@ COPY klipper_config ./printer_data/config/
 COPY --from=build_klipper /build/klipper ./klipper/
 COPY --from=build_klipper /build/klippy-env ./klippy-env/
 
-COPY --from=build_klipper_simulavr /build/klipper/out/klipper.elf ./klipper/simulavr.elf
-
 COPY --from=build_moonraker /build/moonraker ./moonraker/
 COPY --from=build_moonraker /build/moonraker-env ./moonraker-env/
-
-COPY --from=build_simulavr /build/simulavr/build/pysimulavr/pysimulavr ./pysimulavr/
 
 COPY --from=build_mjpg_streamer /build/mjpg-streamer/mjpg-streamer-experimental ./mjpg-streamer/
 
@@ -272,8 +226,6 @@ ENV KLIPPER_REPOSITORY=$KLIPPER_REPOSITORY
 ENV MOONRAKER_REPOSITORY=$MOONRAKER_REPOSITORY
 ENV KLIPPER_SHA=$KLIPPER_SHA
 ENV MOONRAKER_SHA=$MOONRAKER_SHA
-ENV MCU_BACKEND=virtual
-ENV SIMULAVR_PACING_RATE=0.0
 
 WORKDIR /printer
 

@@ -18,6 +18,16 @@ KCONFIG="$KLIPPER_DIR/src/Kconfig"
 rm -rf "$KLIPPER_DIR/src/virtual"
 cp -r "$SCRIPT_DIR/src/virtual" "$KLIPPER_DIR/src/virtual"
 
+# Hosts like WSL2 pause the whole VM for a few ms at a time, which trips
+# the 1ms "Stepper too far in past" check, so allow 10ms instead
+STEPPER="$KLIPPER_DIR/src/stepper.c"
+STEPPER_PAST='if (diff < (int32_t)-timer_from_us(1000))'
+if grep -qF "$STEPPER_PAST" "$STEPPER"; then
+    sed -i 's/(int32_t)-timer_from_us(1000))/(int32_t)-timer_from_us(10000))/' "$STEPPER"
+fi
+grep -qF 'if (diff < (int32_t)-timer_from_us(10000))' "$STEPPER" \
+    || { echo "install.sh: failed to patch $STEPPER" >&2; exit 1; }
+
 if grep -q 'MACH_VIRTUAL' "$KCONFIG"; then
     echo "install.sh: MACH_VIRTUAL already registered"
     exit 0

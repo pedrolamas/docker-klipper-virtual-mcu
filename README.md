@@ -1,9 +1,9 @@
-# docker-klipper-simulavr
+# docker-klipper-virtual-mcu
 
-[![Project Maintenance](https://img.shields.io/maintenance/yes/2026.svg)](https://github.com/pedrolamas/docker-klipper-simulavr 'GitHub Repository')
-[![License](https://img.shields.io/github/license/pedrolamas/docker-klipper-simulavr.svg)](https://github.com/pedrolamas/docker-klipper-simulavr/blob/master/LICENSE 'License')
+[![Project Maintenance](https://img.shields.io/maintenance/yes/2026.svg)](https://github.com/pedrolamas/docker-klipper-virtual-mcu 'GitHub Repository')
+[![License](https://img.shields.io/github/license/pedrolamas/docker-klipper-virtual-mcu.svg)](https://github.com/pedrolamas/docker-klipper-virtual-mcu/blob/master/LICENSE 'License')
 
-[![Release](https://github.com/pedrolamas/docker-klipper-simulavr/workflows/Release/badge.svg)](https://github.com/pedrolamas/docker-klipper-simulavr/actions 'Build Status')
+[![Release](https://github.com/pedrolamas/docker-klipper-virtual-mcu/workflows/Release/badge.svg)](https://github.com/pedrolamas/docker-klipper-virtual-mcu/actions 'Build Status')
 
 [![Follow pedrolamas.com on Bluesky](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpublic.api.bsky.app%2Fxrpc%2Fapp.bsky.actor.getProfile%2F%3Factor%3Dpedrolamas.com&query=%24.followersCount&style=social&logo=bluesky&label=Follow%20%40pedrolamas.com)](https://bsky.app/profile/pedrolamas.com)
 [![Follow pedrolamas on Mastodon](https://img.shields.io/mastodon/follow/109365776481898704?label=Follow%20@pedrolamas%20on%20Mastodon&domain=https%3A%2F%2Fhachyderm.io&style=social)](https://hachyderm.io/@pedrolamas)
@@ -18,9 +18,9 @@ Create and run the new container as you would normally do:
 
 ```sh
 docker run -d \
-  --name klipper-simulavr \
+  --name klipper-virtual-mcu \
   --net=host \
-  ei99070/docker-klipper-simulavr
+  ei99070/docker-klipper-virtual-mcu
 ```
 
 This will start Klipper with a simulated micro-controller, Moonraker on port 7125, and mjpg-streamer on port 8080.
@@ -29,10 +29,10 @@ If you need to remap the default ports, run the container under the bridge netwo
 
 ```sh
 docker run -d \
-  --name klipper-simulavr \
+  --name klipper-virtual-mcu \
   -p 7125:7125 \
   -p 8080:8080 \
-  ei99070/docker-klipper-simulavr
+  ei99070/docker-klipper-virtual-mcu
 ```
 
 ## Virtual MCU
@@ -40,7 +40,7 @@ docker run -d \
 The printer's main MCU is a native "virtual MCU": the Klipper micro-controller code compiled as a Linux process with simulated pins (AVR style names, `PA0`..`PL7`), exposing its serial port at `/tmp/pseudoserial`. It uses almost no CPU when idle and keeps accurate time.
 
 > [!NOTE]
-> Earlier versions of this image used [simulavr](https://github.com/pedrolamas/simulavr) to emulate an ATmega644P. It has been replaced by the virtual MCU, and the `SIMULAVR_PACING_RATE` environment variable is no longer used.
+> This image replaces [docker-klipper-simulavr](https://github.com/pedrolamas/docker-klipper-simulavr), which used [simulavr](https://github.com/pedrolamas/simulavr) to emulate an ATmega644P. The bundled configuration uses the same pins, and the `SIMULAVR_PACING_RATE` environment variable is no longer needed.
 
 | Variable           | Default | Description                                   |
 | ------------------ | ------- | --------------------------------------------- |
@@ -88,10 +88,10 @@ For example, here is how to override the default `printer.cfg`:
 
 ```sh
 docker run -d \
-  --name klipper-simulavr \
+  --name klipper-virtual-mcu \
   --net=host \
   -v my-printer.cfg:/printer/printer_data/config/printer.cfg \
-  ei99070/docker-klipper-simulavr
+  ei99070/docker-klipper-virtual-mcu
 ```
 
 ## Klippy Extras
@@ -112,7 +112,7 @@ The image includes the following convenience scripts:
 Once the Docker container has started, these can be easily run:
 
 ```sh
-docker exec -it klipper-simulavr enable-timelapse
+docker exec -it klipper-virtual-mcu enable-timelapse
 ```
 
 ## Available tags

@@ -1,0 +1,22 @@
+#!/bin/bash
+# Start the main printer mcu using the backend selected by MCU_BACKEND:
+#   virtual  - native virtual mcu (default)
+#   simulavr - atmega644p firmware running in simulavr
+set -e
+
+SERIAL=/tmp/pseudoserial
+
+case "${MCU_BACKEND:-virtual}" in
+  virtual)
+    exec /usr/local/bin/klipper_virtual_mcu -I "$SERIAL"
+    ;;
+  simulavr)
+    export PYTHONPATH=/printer/pysimulavr
+    exec /printer/klipper/scripts/avrsim.py -r "${SIMULAVR_PACING_RATE:-0.0}" \
+      -s 20000000 -p "$SERIAL" /printer/klipper/simulavr.elf
+    ;;
+  *)
+    echo "start-mcu: unknown MCU_BACKEND '${MCU_BACKEND}' (expected virtual or simulavr)" >&2
+    exit 1
+    ;;
+esac

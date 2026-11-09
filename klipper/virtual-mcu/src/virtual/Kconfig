@@ -1,0 +1,24 @@
+# Kconfig settings for the "virtual" micro-controller: the Klipper mcu
+# code compiled as a Linux process with simulated hardware (used in
+# place of simulavr for testing and development).
+
+if MACH_VIRTUAL
+
+config VIRTUAL_SELECT
+    bool
+    default y
+    select HAVE_GPIO
+    select HAVE_GPIO_ADC
+    select HAVE_GPIO_SPI
+    select HAVE_GPIO_I2C
+    select HAVE_GPIO_HARD_PWM
+
+config BOARD_DIRECTORY
+    string
+    default "virtual"
+
+config CLOCK_FREQ
+    int
+    default 20000000
+
+endif

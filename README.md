@@ -35,6 +35,27 @@ docker run -d \
   ei99070/docker-klipper-simulavr
 ```
 
+## MCU backend
+
+By default the printer's main MCU is a native "virtual MCU": the Klipper micro-controller code compiled as a Linux process with simulated pins (AVR style names, `PA0`..`PL7`). It uses almost no CPU when idle and keeps accurate time.
+
+The previous simulavr based atmega644p simulation is still included and can be selected with the `MCU_BACKEND` environment variable:
+
+```sh
+docker run -d \
+  --name klipper-simulavr \
+  --net=host \
+  -e MCU_BACKEND=simulavr \
+  ei99070/docker-klipper-simulavr
+```
+
+| Variable               | Default   | Description                                                   |
+| ---------------------- | --------- | ------------------------------------------------------------- |
+| `MCU_BACKEND`          | `virtual` | `virtual` (native virtual MCU) or `simulavr`                  |
+| `SIMULAVR_PACING_RATE` | `0.0`     | Real-time pacing rate for simulavr (only used with simulavr)  |
+
+Both backends expose the MCU serial port at `/tmp/pseudoserial`.
+
 The default configuration files used can be found on the [klipper_config](/klipper_config) folder.
 
 This is the runtime folder structure:

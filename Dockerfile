@@ -94,6 +94,21 @@ RUN <<eot
   )
 eot
 
+FROM klipper_source AS build_klipper_virtual
+
+COPY klipper/virtual-mcu ./virtual-mcu
+COPY klipper/virtual.config ./klipper/.config
+
+RUN <<eot
+  set -e
+  sh ./virtual-mcu/install.sh ./klipper
+  (
+    cd klipper
+    make olddefconfig
+    make
+  )
+eot
+
 FROM klipper_source AS build_klipper_host
 
 COPY klipper/host.config ./klipper/.config
@@ -199,6 +214,7 @@ FROM tools AS rootfs
 COPY rootfs .
 
 COPY --from=build_klipper_host /build/klipper/out/klipper.elf ./usr/local/bin/klipper_mcu
+COPY --from=build_klipper_virtual /build/klipper/out/klipper.elf ./usr/local/bin/klipper_virtual_mcu
 
 RUN <<eot
   set -e
@@ -256,6 +272,7 @@ ENV KLIPPER_REPOSITORY=$KLIPPER_REPOSITORY
 ENV MOONRAKER_REPOSITORY=$MOONRAKER_REPOSITORY
 ENV KLIPPER_SHA=$KLIPPER_SHA
 ENV MOONRAKER_SHA=$MOONRAKER_SHA
+ENV MCU_BACKEND=virtual
 ENV SIMULAVR_PACING_RATE=0.0
 
 WORKDIR /printer

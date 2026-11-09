@@ -160,8 +160,8 @@ MY_NAME="${0##*/}"
   start | stop | restart)
     for UNIT in "${OTHER_ARGUMENTS[@]}"; do
       if [ "$UNIT" = "klipper" ]; then
-        # klipper depends on simulavr and klipper_mcu; operate them in dependency order
-        /usr/bin/supervisorctl "$COMMAND" simulavr klipper_mcu klipper
+        # klipper depends on mcu and klipper_mcu; operate them in dependency order
+        /usr/bin/supervisorctl "$COMMAND" mcu klipper_mcu klipper
       else
         /usr/bin/supervisorctl "$COMMAND" "$UNIT"
       fi

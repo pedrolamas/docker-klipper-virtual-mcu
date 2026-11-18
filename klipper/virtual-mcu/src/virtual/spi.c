@@ -7,7 +7,25 @@
 #include "gpio.h" // spi_setup
 #include "sched.h" // sched_shutdown
 
+// Common bus names from other mcus, all of them the same empty bus
 DECL_ENUMERATION("spi_bus", "spi", 0);
+DECL_ENUMERATION("spi_bus", "spi0", 0);
+DECL_ENUMERATION("spi_bus", "spi0a", 0);
+DECL_ENUMERATION("spi_bus", "spi0b", 0);
+DECL_ENUMERATION("spi_bus", "spi0c", 0);
+DECL_ENUMERATION("spi_bus", "spi0d", 0);
+DECL_ENUMERATION("spi_bus", "spi1", 0);
+DECL_ENUMERATION("spi_bus", "spi1a", 0);
+DECL_ENUMERATION("spi_bus", "spi1b", 0);
+DECL_ENUMERATION("spi_bus", "spi1c", 0);
+DECL_ENUMERATION("spi_bus", "spi2", 0);
+DECL_ENUMERATION("spi_bus", "spi2a", 0);
+DECL_ENUMERATION("spi_bus", "spi2b", 0);
+DECL_ENUMERATION("spi_bus", "spi3", 0);
+DECL_ENUMERATION("spi_bus", "spi3a", 0);
+DECL_ENUMERATION("spi_bus", "spi4", 0);
+DECL_ENUMERATION("spi_bus", "spi5", 0);
+DECL_ENUMERATION("spi_bus", "spi6", 0);
 
 struct spi_config
 spi_setup(uint32_t bus, uint8_t mode, uint32_t rate)

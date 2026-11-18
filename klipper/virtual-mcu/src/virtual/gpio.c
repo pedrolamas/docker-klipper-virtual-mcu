@@ -2,22 +2,26 @@
 //
 // This file may be distributed under the terms of the GNU GPLv3 license.
 
+#include <stdlib.h> // strtoul
+#include <string.h> // strncmp
 #include "command.h" // shutdown
 #include "gpio.h" // gpio_out_write
 #include "sched.h" // sched_shutdown
 #include "virtual.h" // struct virtual_pin
 
-DECL_ENUMERATION_RANGE("pin", "PA0", VGPIO('A', 0), 8);
-DECL_ENUMERATION_RANGE("pin", "PB0", VGPIO('B', 0), 8);
-DECL_ENUMERATION_RANGE("pin", "PC0", VGPIO('C', 0), 8);
-DECL_ENUMERATION_RANGE("pin", "PD0", VGPIO('D', 0), 8);
-DECL_ENUMERATION_RANGE("pin", "PE0", VGPIO('E', 0), 8);
-DECL_ENUMERATION_RANGE("pin", "PF0", VGPIO('F', 0), 8);
-DECL_ENUMERATION_RANGE("pin", "PG0", VGPIO('G', 0), 8);
-DECL_ENUMERATION_RANGE("pin", "PH0", VGPIO('H', 0), 8);
-DECL_ENUMERATION_RANGE("pin", "PJ0", VGPIO('J', 0), 8);
-DECL_ENUMERATION_RANGE("pin", "PK0", VGPIO('K', 0), 8);
-DECL_ENUMERATION_RANGE("pin", "PL0", VGPIO('L', 0), 8);
+DECL_ENUMERATION_RANGE("pin", "PA0", VGPIO('A', 0), VPORT_PINS);
+DECL_ENUMERATION_RANGE("pin", "PB0", VGPIO('B', 0), VPORT_PINS);
+DECL_ENUMERATION_RANGE("pin", "PC0", VGPIO('C', 0), VPORT_PINS);
+DECL_ENUMERATION_RANGE("pin", "PD0", VGPIO('D', 0), VPORT_PINS);
+DECL_ENUMERATION_RANGE("pin", "PE0", VGPIO('E', 0), VPORT_PINS);
+DECL_ENUMERATION_RANGE("pin", "PF0", VGPIO('F', 0), VPORT_PINS);
+DECL_ENUMERATION_RANGE("pin", "PG0", VGPIO('G', 0), VPORT_PINS);
+DECL_ENUMERATION_RANGE("pin", "PH0", VGPIO('H', 0), VPORT_PINS);
+DECL_ENUMERATION_RANGE("pin", "PI0", VGPIO('I', 0), VPORT_PINS);
+DECL_ENUMERATION_RANGE("pin", "PJ0", VGPIO('J', 0), VPORT_PINS);
+DECL_ENUMERATION_RANGE("pin", "PK0", VGPIO('K', 0), VPORT_PINS);
+DECL_ENUMERATION_RANGE("pin", "PL0", VGPIO('L', 0), VPORT_PINS);
+DECL_ENUMERATION_RANGE("pin", "gpio0", VGPIO_NUM_BASE, VGPIO_NUM_COUNT);
 
 static struct virtual_pin pins[VPIN_COUNT];
 
@@ -29,14 +33,29 @@ virtual_pin_get(uint32_t pin)
     return &pins[pin];
 }
 
-// Parse an AVR style pin name ("PD7") into a pin id
+// Parse a pin name ("PD7", "PB13" or "gpio5") into a pin id
 int
 virtual_pin_parse(const char *name, uint32_t *pin)
 {
-    if (name[0] != 'P' || name[1] < 'A' || name[1] > 'L' || name[1] == 'I'
-        || name[2] < '0' || name[2] > '7' || name[3])
+    uint32_t base, count;
+    if (name[0] == 'P' && name[1] >= 'A' && name[1] <= 'L') {
+        base = VGPIO(name[1], 0);
+        count = VPORT_PINS;
+        name += 2;
+    } else if (strncmp(name, "gpio", 4) == 0) {
+        base = VGPIO_NUM_BASE;
+        count = VGPIO_NUM_COUNT;
+        name += 4;
+    } else {
         return -1;
-    *pin = VGPIO(name[1], name[2] - '0');
+    }
+    if (name[0] < '0' || name[0] > '9' || (name[0] == '0' && name[1]))
+        return -1;
+    char *end;
+    unsigned long num = strtoul(name, &end, 10);
+    if (*end || num >= count)
+        return -1;
+    *pin = base + num;
     return 0;
 }
 

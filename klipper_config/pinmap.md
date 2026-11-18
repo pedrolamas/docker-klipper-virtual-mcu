@@ -95,4 +95,4 @@ The following pins are currently unassigned and available for additional feature
 - ADC channels (Port A) are used for temperature sensing simulation
 - JTAG debugging pins (PC2-PC6) and timer-related pins (PB0-PB1, PC6-PC7, PD4-PD6) are repurposed for stepper motor control
 - All hardware communication interfaces (SPI, I²C, UART) remain available for expansion
-- The virtual MCU accepts any pin from PA0 to PL7; only the ATmega644P ports (A-D) are listed here
+- The virtual MCU also accepts PA0 to PL15 and gpio0 to gpio47; only the ATmega644P pins are listed here

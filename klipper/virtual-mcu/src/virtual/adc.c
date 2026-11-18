@@ -7,8 +7,8 @@
 #include "sched.h" // sched_shutdown
 #include "virtual.h" // virtual_pin_get
 
-// Same resolution as the AVR adc the bundled configs were written for
-#define ADC_MAX 1023
+// 12bit, like the STM32, RP2040 and Linux mcu targets
+#define ADC_MAX 4095
 DECL_CONSTANT("ADC_MAX", ADC_MAX);
 
 // 100K NTC thermistor at 25C with a 4.7K pull-up: 100/(100+4.7) of full

@@ -8,7 +8,30 @@
 #include "i2ccmds.h" // I2C_BUS_SUCCESS
 #include "sched.h" // sched_shutdown
 
+// Common bus names from other mcus, all of them the same empty bus
 DECL_ENUMERATION("i2c_bus", "twi", 0);
+DECL_ENUMERATION("i2c_bus", "i2c0", 0);
+DECL_ENUMERATION("i2c_bus", "i2c0a", 0);
+DECL_ENUMERATION("i2c_bus", "i2c0b", 0);
+DECL_ENUMERATION("i2c_bus", "i2c0c", 0);
+DECL_ENUMERATION("i2c_bus", "i2c0d", 0);
+DECL_ENUMERATION("i2c_bus", "i2c0e", 0);
+DECL_ENUMERATION("i2c_bus", "i2c0f", 0);
+DECL_ENUMERATION("i2c_bus", "i2c0g", 0);
+DECL_ENUMERATION("i2c_bus", "i2c0h", 0);
+DECL_ENUMERATION("i2c_bus", "i2c1", 0);
+DECL_ENUMERATION("i2c_bus", "i2c1a", 0);
+DECL_ENUMERATION("i2c_bus", "i2c1b", 0);
+DECL_ENUMERATION("i2c_bus", "i2c1c", 0);
+DECL_ENUMERATION("i2c_bus", "i2c1d", 0);
+DECL_ENUMERATION("i2c_bus", "i2c1e", 0);
+DECL_ENUMERATION("i2c_bus", "i2c1f", 0);
+DECL_ENUMERATION("i2c_bus", "i2c1g", 0);
+DECL_ENUMERATION("i2c_bus", "i2c2", 0);
+DECL_ENUMERATION("i2c_bus", "i2c2a", 0);
+DECL_ENUMERATION("i2c_bus", "i2c3", 0);
+DECL_ENUMERATION("i2c_bus", "i2c3a", 0);
+DECL_ENUMERATION("i2c_bus", "i2c4", 0);
 
 struct i2c_config
 i2c_setup(uint32_t bus, uint32_t rate, uint8_t addr)

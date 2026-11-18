@@ -4,10 +4,14 @@
 
 #include <stdint.h> // uint32_t
 
-// Pins use AVR style names (PA0..PL7) so existing AVR configs work
+// Pins accept AVR and STM32 style names (PA0..PL15) and RP2040 style names
+// (gpio0..gpio47) so configs written for those boards can be reused
 #define VPORT_COUNT 12 // A..L
-#define VGPIO(PORT, NUM) (((PORT) - 'A') * 8 + (NUM))
-#define VPIN_COUNT (VPORT_COUNT * 8)
+#define VPORT_PINS 16
+#define VGPIO(PORT, NUM) (((PORT) - 'A') * VPORT_PINS + (NUM))
+#define VGPIO_NUM_BASE (VPORT_COUNT * VPORT_PINS)
+#define VGPIO_NUM_COUNT 48
+#define VPIN_COUNT (VGPIO_NUM_BASE + VGPIO_NUM_COUNT)
 
 enum { VPIN_UNUSED, VPIN_OUT, VPIN_IN, VPIN_ADC, VPIN_PWM };
 

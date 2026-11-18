@@ -37,7 +37,7 @@ docker run -d \
 
 ## Virtual MCU
 
-The printer's main MCU is a native "virtual MCU": the Klipper micro-controller code compiled as a Linux process with simulated pins (AVR style names, `PA0`..`PL7`), exposing its serial port at `/tmp/pseudoserial`. It uses almost no CPU when idle and keeps accurate time.
+The printer's main MCU is a native "virtual MCU": the Klipper micro-controller code compiled as a Linux process with simulated pins, exposing its serial port at `/tmp/pseudoserial`. It uses almost no CPU when idle and keeps accurate time.
 
 > [!NOTE]
 > This image replaces [docker-klipper-simulavr](https://github.com/pedrolamas/docker-klipper-simulavr), which used [simulavr](https://github.com/pedrolamas/simulavr) to emulate an ATmega644P. The bundled configuration uses the same pins, and the `SIMULAVR_PACING_RATE` environment variable is no longer needed.
@@ -71,6 +71,15 @@ The virtual MCU also tracks where each axis is: it counts the steps sent to the 
 `PC6` is also the `[probe]` pin, which triggers at Z=0, so `PROBE`, `PROBE_ACCURACY` and `BED_MESH_CALIBRATE` work (the simulated bed is perfectly flat). BLTouch is not simulated.
 
 If you use your own `printer.cfg` with different pins, replace the axes with `-E STEP_PIN:DIR_PIN:ENDSTOP_PIN[:STEPS_PER_MM[:LENGTH_MM[:START_MM]]]` options (repeatable, or `-E none` to disable them). Prefix the dir pin with `!` if it is inverted in the config, and the endstop pin with `!` if it is inverted (triggered when low). The defaults are 80 steps/mm (`rotation_distance: 40` with 16 microsteps), a 300mm rail and a 10mm start position, for example `-e VIRTUAL_MCU_ARGS="-E PB0:!PB1:PB2 -E PB3:PC2:!PC3:160"`. Input pins without an axis read as their pull-up.
+
+### Using configs from other boards
+
+To make configs written for real boards easier to reuse, the virtual MCU accepts:
+
+- AVR and STM32 style pin names, `PA0`..`PL15`, and RP2040 style pin names, `gpio0`..`gpio47`
+- common SPI bus names (such as `spi1`, `spi2a` and `spi0a`) and I2C bus names (such as `i2c1`, `i2c2a` and `i2c0a`), which all reach the same empty bus: writes succeed and reads return zeros
+
+Heaters, thermistors, endstops and the probe on other pins still need matching `-T` and `-E` options. Devices that must answer the MCU, such as TMC stepper drivers and accelerometers, are not simulated, so remove those sections from the config.
 
 The default configuration files used can be found on the [klipper_config](/klipper_config) folder.
 

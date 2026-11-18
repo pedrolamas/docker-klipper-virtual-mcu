@@ -49,6 +49,8 @@ pin_set_state(struct virtual_pin *p, uint8_t val)
         uint32_t now = timer_read_time();
         if (p->heats)
             thermal_heater_changed(p->heats, p->state, now);
+        if (p->moves)
+            motion_step_changed(p->moves, val);
         p->state = val;
         p->changed = now;
     }
@@ -69,6 +71,9 @@ void
 gpio_out_reset(struct gpio_out g, uint8_t val)
 {
     g.pin->mode = VPIN_OUT;
+    if (g.pin->moves)
+        // Klipper sets up step pins at their idle level
+        motion_step_setup(g.pin->moves, val);
     pin_set_state(g.pin, val);
 }
 
@@ -111,6 +116,8 @@ gpio_in_reset(struct gpio_in g, int8_t pull_up)
 uint8_t
 gpio_in_read(struct gpio_in g)
 {
+    if (g.pin->endstop)
+        return motion_endstop_read(g.pin->endstop);
     // Nothing is wired to the pin, so it reads as its bias - the same
     // behaviour as an unconnected pin in simulavr.
     return g.pin->pull_up > 0;

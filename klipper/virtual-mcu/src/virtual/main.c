@@ -11,7 +11,7 @@
 #include "command.h" // DECL_CONSTANT
 #include "../linux/internal.h" // console_setup
 #include "sched.h" // sched_main
-#include "virtual.h" // thermal_add
+#include "virtual.h" // thermal_add, motion_add
 
 DECL_CONSTANT_STR("MCU", "virtual");
 
@@ -42,9 +42,9 @@ main(int argc, char **argv)
 {
     // Parse program args
     orig_argv = argv;
-    int opt, custom_zones = 0;
+    int opt, custom_zones = 0, custom_axes = 0;
     char *serial = "/tmp/pseudoserial";
-    while ((opt = getopt(argc, argv, "I:T:")) != -1) {
+    while ((opt = getopt(argc, argv, "I:T:E:")) != -1) {
         switch (opt) {
         case 'I':
             serial = optarg;
@@ -55,15 +55,26 @@ main(int argc, char **argv)
             if (strcmp(optarg, "none") != 0 && thermal_add(optarg))
                 return -1;
             break;
+        case 'E':
+            // -E STEP_PIN:[!]DIR_PIN:[!]ENDSTOP_PIN[:...] (repeatable),
+            // or -E none
+            custom_axes = 1;
+            if (strcmp(optarg, "none") != 0 && motion_add(optarg))
+                return -1;
+            break;
         default:
             fprintf(stderr, "Usage: %s [-I path]"
-                    " [-T heater_pin:sensor_pin:hotend|bed | -T none]\n"
+                    " [-T heater_pin:sensor_pin:hotend|bed | -T none]"
+                    " [-E step_pin:[!]dir_pin:[!]endstop_pin"
+                    "[:steps_per_mm[:length_mm[:start_mm]]] | -E none]\n"
                     , argv[0]);
             return -1;
         }
     }
     if (!custom_zones)
         thermal_add_defaults();
+    if (!custom_axes)
+        motion_add_defaults();
 
     // Initial setup
     int ret = console_setup(serial);

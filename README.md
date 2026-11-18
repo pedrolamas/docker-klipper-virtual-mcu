@@ -58,6 +58,20 @@ The virtual MCU simulates heaters: each "thermal zone" pairs a heater pin with a
 
 If you use your own `printer.cfg` with different pins, replace the zones with `-T HEATER_PIN:SENSOR_PIN:PRESET` options (repeatable, or `-T none` to disable them), for example `-e VIRTUAL_MCU_ARGS="-T PD5:PA0:hotend -T PD6:PA1:bed"`. Analog pins without a zone read a constant 25°C.
 
+### Simulated endstops and probe
+
+The virtual MCU also tracks where each axis is: it counts the steps sent to the stepper's step pin, in the direction set by its dir pin, and the endstop pin reads as triggered while the carriage is at either end of a 300mm rail. Each carriage starts 10mm from the minimum end, so homing travels a real distance, with the usual retract and second approach, whether the config homes to the minimum (cartesian) or to the maximum (delta). The default axes match the bundled configuration:
+
+| Axis                    | Step pin | Dir pin | Endstop pin |
+| ----------------------- | -------- | ------- | ----------- |
+| `stepper_x`/`stepper_a` | `PB0`    | `!PB1`  | `PB2`       |
+| `stepper_y`/`stepper_b` | `PB3`    | `!PC2`  | `PC3`       |
+| `stepper_z`/`stepper_c` | `PC4`    | `PC5`   | `PC6`       |
+
+`PC6` is also the `[probe]` pin, which triggers at Z=0, so `PROBE`, `PROBE_ACCURACY` and `BED_MESH_CALIBRATE` work (the simulated bed is perfectly flat). BLTouch is not simulated.
+
+If you use your own `printer.cfg` with different pins, replace the axes with `-E STEP_PIN:DIR_PIN:ENDSTOP_PIN[:STEPS_PER_MM[:LENGTH_MM[:START_MM]]]` options (repeatable, or `-E none` to disable them). Prefix the dir pin with `!` if it is inverted in the config, and the endstop pin with `!` if it is inverted (triggered when low). The defaults are 80 steps/mm (`rotation_distance: 40` with 16 microsteps), a 300mm rail and a 10mm start position, for example `-e VIRTUAL_MCU_ARGS="-E PB0:!PB1:PB2 -E PB3:PC2:!PC3:160"`. Input pins without an axis read as their pull-up.
+
 The default configuration files used can be found on the [klipper_config](/klipper_config) folder.
 
 This is the runtime folder structure:

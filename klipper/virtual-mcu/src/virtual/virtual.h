@@ -19,6 +19,8 @@ struct virtual_pin {
     uint32_t changed;  // timer_read_time() of the last state change
     struct thermal_zone *heats;   // zone heated by this pin (output)
     struct thermal_zone *senses;  // zone measured by this pin (adc)
+    struct motion_axis *moves;    // axis stepped by this pin (output)
+    struct motion_axis *endstop;  // axis whose endstop is this pin (input)
 };
 
 // gpio.c
@@ -31,5 +33,12 @@ void thermal_add_defaults(void);
 void thermal_heater_changed(struct thermal_zone *z, uint8_t old_state
                             , uint32_t now);
 uint16_t thermal_adc_read(struct thermal_zone *z, uint16_t adc_max);
+
+// motion.c
+int motion_add(const char *spec);
+void motion_add_defaults(void);
+void motion_step_setup(struct motion_axis *a, uint8_t val);
+void motion_step_changed(struct motion_axis *a, uint8_t val);
+uint8_t motion_endstop_read(struct motion_axis *a);
 
 #endif // virtual.h

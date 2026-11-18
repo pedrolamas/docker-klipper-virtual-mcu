@@ -53,7 +53,9 @@ This document provides a comprehensive pinmap for the virtual MCU and how its pi
 
 - **X-Axis Stepper**: PB0 (step), PB1 (direction), PB2 (endstop)
 - **Y-Axis Stepper**: PB3 (step), PC2 (direction), PC3 (endstop)
-- **Z-Axis Stepper**: PC4 (step), PC5 (direction), PC6 (endstop)
+- **Z-Axis Stepper**: PC4 (step), PC5 (direction), PC6 (endstop, or probe)
+
+The delta configuration uses the same pins for `stepper_a`, `stepper_b` and `stepper_c`. Each step/direction/endstop set is a simulated axis, so endstops trigger when the carriage reaches the end of its travel and the probe triggers at Z=0.
 
 ### Extruders
 

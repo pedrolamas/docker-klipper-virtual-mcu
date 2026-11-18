@@ -2,7 +2,6 @@
 //
 // This file may be distributed under the terms of the GNU GPLv3 license.
 
-#include "board/misc.h" // timer_read_time
 #include "command.h" // shutdown
 #include "gpio.h" // gpio_out_write
 #include "sched.h" // sched_shutdown
@@ -46,7 +45,7 @@ pin_set_state(struct virtual_pin *p, uint8_t val)
 {
     val = !!val;
     if (p->state != val) {
-        uint32_t now = timer_read_time();
+        uint32_t now = virtual_real_time();
         if (p->heats)
             thermal_heater_changed(p->heats, p->state, now);
         if (p->moves)

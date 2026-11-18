@@ -2,7 +2,6 @@
 //
 // This file may be distributed under the terms of the GNU GPLv3 license.
 
-#include "board/misc.h" // timer_read_time
 #include "command.h" // DECL_CONSTANT
 #include "gpio.h" // gpio_pwm_write
 #include "sched.h" // sched_shutdown
@@ -27,6 +26,6 @@ gpio_pwm_write(struct gpio_pwm g, uint16_t val)
 {
     if (g.pin->pwm != val) {
         g.pin->pwm = val;
-        g.pin->changed = timer_read_time();
+        g.pin->changed = virtual_real_time();
     }
 }

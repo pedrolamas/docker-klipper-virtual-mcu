@@ -16,7 +16,7 @@ struct virtual_pin {
     uint8_t state;     // current output level (VPIN_OUT)
     int8_t pull_up;    // pull-up (>0) / pull-down (<0) for inputs
     uint16_t pwm;      // last hardware pwm value (VPIN_PWM)
-    uint32_t changed;  // timer_read_time() of the last state change
+    uint32_t changed;  // virtual_real_time() of the last state change
     struct thermal_zone *heats;   // zone heated by this pin (output)
     struct thermal_zone *senses;  // zone measured by this pin (adc)
     struct motion_axis *moves;    // axis stepped by this pin (output)
@@ -26,6 +26,9 @@ struct virtual_pin {
 // gpio.c
 struct virtual_pin *virtual_pin_get(uint32_t pin); // NULL if invalid
 int virtual_pin_parse(const char *name, uint32_t *pin);
+
+// timer.c
+uint32_t virtual_real_time(void);
 
 // thermal.c
 int thermal_add(const char *spec);

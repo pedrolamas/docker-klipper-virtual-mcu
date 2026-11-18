@@ -16,7 +16,6 @@
 #include <stdlib.h> // rand_r
 #include <string.h> // strchr
 #include "autoconf.h" // CONFIG_CLOCK_FREQ
-#include "board/misc.h" // timer_read_time
 #include "virtual.h" // struct virtual_pin
 
 #define AMBIENT_TEMP 25.
@@ -152,7 +151,7 @@ thermal_heater_changed(struct thermal_zone *z, uint8_t old_state
 uint16_t
 thermal_adc_read(struct thermal_zone *z, uint16_t adc_max)
 {
-    zone_update(z, timer_read_time());
+    zone_update(z, virtual_real_time());
     // Add +/- 0.5 lsb of dither so oversampled readings resolve
     // temperatures finer than one adc step
     static unsigned int seed = 1;

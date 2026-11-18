@@ -166,8 +166,10 @@ jobs:
           push: false
           sbom: false
           provenance: false
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: |
+            type=gha
+            type=gha,scope=smoke-test
+          cache-to: type=gha,mode=max,scope=smoke-test
           tags: klipper-smoke-test:latest
 
       - name: Smoke test Docker image

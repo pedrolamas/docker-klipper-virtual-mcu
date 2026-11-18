@@ -147,6 +147,33 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Build Docker image for testing
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64
+          build-args: |
+            KLIPPER_REPOSITORY=${{ env.KLIPPER_REPOSITORY }}
+            KLIPPER_SHA=${{ needs.setup.outputs.klipper_sha }}
+            MOONRAKER_REPOSITORY=${{ env.MOONRAKER_REPOSITORY }}
+            MOONRAKER_SHA=${{ needs.setup.outputs.moonraker_sha }}
+            MJPG_STREAMER_SHA=${{ needs.setup.outputs.mjpg_streamer_sha }}
+            KLIPPER_VIRTUAL_PINS_SHA=${{ needs.setup.outputs.klipper_virtual_pins_sha }}
+            KIAUH_SHA=${{ needs.setup.outputs.kiauh_sha }}
+            MOONRAKER_TIMELAPSE_SHA=${{ needs.setup.outputs.moonraker_timelapse_sha }}
+          load: true
+          push: false
+          sbom: false
+          provenance: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          tags: klipper-smoke-test:latest
+
+      - name: Smoke test Docker image
+        timeout-minutes: 10
+        run: bash .github/scripts/smoke-test.sh klipper-smoke-test:latest
+
       - name: Build and push Docker image
         id: docker_push
         uses: docker/build-push-action@v7
